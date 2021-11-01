@@ -32,6 +32,10 @@ namespace FoundamentalWaitHandleDemo
             WaitHandle.WaitAny(waitHandles);
             stopwatch.Stop();
             Console.WriteLine($"one of tasks are completed (time elapsed={stopwatch.ElapsedMilliseconds}ms)");
+
+            //Don't forget Dispose of the type.
+            waitHandles[0].Close();
+            waitHandles[1].Close();
         }
 
         public static void DoSomeTask(object eve)
