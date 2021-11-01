@@ -14,28 +14,28 @@ namespace FoundamentalWaitHandleDemo
         private static Random random = new Random();
         public static void Main(string[] args)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            Console.WriteLine($"Main thread is waiting for BOTH tashs to complete.");
-            stopwatch.Start();
-            ThreadPool.QueueUserWorkItem(DoSomeTask, waitHandles[0]);
-            ThreadPool.QueueUserWorkItem(DoSomeTask, waitHandles[1]);
-            WaitHandle.WaitAll(waitHandles);
-            stopwatch.Stop();
-            Console.WriteLine($"BOTH tasks are completed (time elapsed={stopwatch.ElapsedMilliseconds}ms)");
-            stopwatch.Reset();
+            using (waitHandles[0])
+            using (waitHandles[1])
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                Console.WriteLine($"Main thread is waiting for BOTH tashs to complete.");
+                stopwatch.Start();
+                ThreadPool.QueueUserWorkItem(DoSomeTask, waitHandles[0]);
+                ThreadPool.QueueUserWorkItem(DoSomeTask, waitHandles[1]);
+                WaitHandle.WaitAll(waitHandles);
+                stopwatch.Stop();
+                Console.WriteLine($"BOTH tasks are completed (time elapsed={stopwatch.ElapsedMilliseconds}ms)");
+                stopwatch.Reset();
 
-            //AutoResetEvent has reset.
-            Console.WriteLine($"Main is waiting for any one task to complete.");
-            stopwatch.Start();
-            ThreadPool.QueueUserWorkItem(DoSomeTask, waitHandles[0]);
-            ThreadPool.QueueUserWorkItem(DoSomeTask, waitHandles[1]);
-            WaitHandle.WaitAny(waitHandles);
-            stopwatch.Stop();
-            Console.WriteLine($"one of tasks are completed (time elapsed={stopwatch.ElapsedMilliseconds}ms)");
-
-            //Don't forget Dispose of the type.
-            waitHandles[0].Close();
-            waitHandles[1].Close();
+                //AutoResetEvent has reset.
+                Console.WriteLine($"Main is waiting for any one task to complete.");
+                stopwatch.Start();
+                ThreadPool.QueueUserWorkItem(DoSomeTask, waitHandles[0]);
+                ThreadPool.QueueUserWorkItem(DoSomeTask, waitHandles[1]);
+                WaitHandle.WaitAny(waitHandles);
+                stopwatch.Stop();
+                Console.WriteLine($"one of tasks are completed (time elapsed={stopwatch.ElapsedMilliseconds}ms)");
+            }
         }
 
         public static void DoSomeTask(object eve)
